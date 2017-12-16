@@ -4,27 +4,27 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 
 public class Packet {
-	private InetAddress clientAddress;
-	private int clientPort;
+	private String address;
+	private int port;
 	private String data;
 	
-	public Packet(InetAddress add, int port, String data) {
-		this.clientAddress = add;
-		this.clientPort = port;
+	public Packet(String add, int port, String data) {
+		this.address = add;
+		this.port = port;
 		this.data = data;
 	}
 	
-	public InetAddress getClientAddress() {
-		return clientAddress;
+	public String getAddress() {
+		return address;
 	}
-	public void setClientAddress(InetAddress clientAdress) {
-		this.clientAddress = clientAdress;
+	public void setAddress(String address) {
+		this.address = address;
 	}
-	public int getClientPort() {
-		return clientPort;
+	public int getPort() {
+		return port;
 	}
-	public void setClientPort(int clientPort) {
-		this.clientPort = clientPort;
+	public void setPort(int port) {
+		this.port = port;
 	}
 	public String getData() {
 		return data;
@@ -36,10 +36,14 @@ public class Packet {
 	public DatagramPacket getDataPacket() {
 
         byte[] sendData = data.getBytes();
-
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientAddress, clientPort);
-        return sendPacket;
-	}
+        try {
+        	DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(address), port);
+        	return sendPacket;
+        }catch(Exception e) {
+        	
+        }
+        return null;
+     }
 	
 	
 }

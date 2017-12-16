@@ -2,9 +2,9 @@ package connect;
 
 public class Server {
 	private String address;
-	private String port;
+	private int port;
 	
-	public Server(String address, String port) {
+	public Server(String address, int port) {
 		this.address = address;
 		this.port = port;
 	}
@@ -14,10 +14,10 @@ public class Server {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public String getPort() {
+	public int getPort() {
 		return port;
 	}
-	public void setPort(String port) {
+	public void setPort(int port) {
 		this.port = port;
 	}
 }

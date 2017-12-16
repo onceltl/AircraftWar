@@ -3,9 +3,9 @@ package connect;
 public class Client {
 	private String name;
 	private String address;
-	private String port;
+	private int port;
 	
-	public Client(String name, String address, String port) {
+	public Client(String name, String address, int port) {
 		this.name = name;
 		this.address = address;
 		this.port = port;
@@ -23,10 +23,10 @@ public class Client {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public String getPort() {
+	public int getPort() {
 		return port;
 	}
-	public void setPort(String port) {
+	public void setPort(int port) {
 		this.port = port;
 	}
 }
