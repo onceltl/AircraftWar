@@ -1,6 +1,7 @@
 package controller;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -22,6 +23,8 @@ import connect.Listener;
 import connect.Packet;
 import connect.Sender;
 import connect.Server;
+import sprites.Dir;
+import sprites.Plane;
 
 
 public class GameWindow extends JPanel{
@@ -42,7 +45,7 @@ public class GameWindow extends JPanel{
 	public DatagramSocket serversocket;
 	public DatagramSocket clientsocket;
 	public Sender serversender;
-	
+	public SpriteThread spritethread;
 	public GameWindow() {
 		//窗口基本设置
 		setSize(width, height);
@@ -52,6 +55,7 @@ public class GameWindow extends JPanel{
 		window.setSize(width, height+35);
 		window.setResizable(false);
 		window.setVisible(true);
+		window.setIconImage(ImageController.getInstance().icon);
 		//jdialog设置
 		//GridLayout layout=new GridLayout(3,1);
 		joindialog=new JDialog(window,"房间",true);
@@ -99,10 +103,30 @@ public class GameWindow extends JPanel{
 		//  graphicsthread.run();
 	}
 	public void startgame() {
+		Packet packet= new Packet(clientp1.getAddress(),clientp1.getPort(),
+				"Start!");
+		serversender.addPacket(packet);
+		if (clientp2!=null) {
+			packet= new Packet(clientp2.getAddress(),clientp2.getPort(),
+					"Start!");
+			serversender.addPacket(packet);
+		}
+	
 		//飞机
-		
-	    //游戏线程：产生敌人,move,碰撞
-		
+		SpriteController.getInstance().clear();
+		Plane herop1=new Plane(100,530,70,70,serverp1,1,new Dir(0,0));
+		SpriteController.getInstance().sethero1p(herop1);
+		if (clientp2!=null) {
+			Plane herop2=new Plane(200,530,70,70,serverp2,1,new Dir(0,0));
+			SpriteController.getInstance().sethero2p(herop2);
+		}
+		System.out.println(SpriteController.getInstance().getinfo());
+		//游戏线程：产生敌人,move,碰撞
+		spritethread=new SpriteThread(this);
+		spritethread.start();
+	}
+	public void togame() {
+		State.getInstance().nextstate();
 	}
 	public static void main(String[] args) {
 		GameWindow gamewindow=new GameWindow();
@@ -165,7 +189,7 @@ public class GameWindow extends JPanel{
 					break;
 				default:
 					;
-			}
+				}
 			}
 			g.drawImage(ImageController.getInstance().plane[1][1], 40, 140,120,120,null);
 			g.drawImage(ImageController.getInstance().plane[2][1], 213, 140,120,120,null);
@@ -175,8 +199,24 @@ public class GameWindow extends JPanel{
 			return;
 		}
 		if (State.getInstance().isInGame()) {
+			g.setColor(Color.BLACK);
+			g.fillRect(0,0,width,height);
 			SpriteShow.getInstance().paint(g);
 			return;
+		}
+		if (State.getInstance().isInTest()) {
+			g.drawImage(ImageController.getInstance().backgroud[1], 0,0,380,600,null);
+			g.drawImage(ImageController.getInstance().plane[1][1], 100,530,70,70,null);
+			g.drawImage(ImageController.getInstance().plane[2][1], 200,530,70,70,null);
+
+			g.drawImage(ImageController.getInstance().enemy[1], 100,100,70,70,null);
+			g.drawImage(ImageController.getInstance().enemy[2], 200,100,70,70,null);
+			g.drawImage(ImageController.getInstance().enemy[3], 300,100,70,70,null);
+			g.drawImage(ImageController.getInstance().enemy[4], 100,200,70,70,null);
+			g.drawImage(ImageController.getInstance().enemy[5], 100,300,70,70,null);
+			g.drawImage(ImageController.getInstance().enemy[6], 200,200,70,70,null);
+			g.drawImage(ImageController.getInstance().enemy[7], 200,300,70,70,null);
+			g.drawImage(ImageController.getInstance().enemy[8], 300,300,70,70,null);
 		}
 	}
 	public void create_Room() {

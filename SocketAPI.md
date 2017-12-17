@@ -18,9 +18,12 @@
 4.P1发起开始游戏
 
 	AskStart
-	返回P1：GAME 
-	返回P2：GAME
+	返回P1：Start! 
+	返回P2：Start!
 
-5.
+5.游戏数据
+	返回P1： GAME，score,n
+		    x,y,w,h,number
+	返回P2：GAME
 	
 	

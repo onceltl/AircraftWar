@@ -19,6 +19,9 @@ public class State {
 	public boolean isInEnd() {
 		return state==3;
 	}
+	public boolean isInTest() {
+		return state==4;
+	}
 	public void nextstate() {
 		state=(state+1)%4;
 	}

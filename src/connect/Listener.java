@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 
 import controller.Constant;
 import controller.GameWindow;
+import controller.SpriteShow;
+import controller.State;
 
 
 public class Listener {
@@ -118,9 +120,26 @@ public class Listener {
 				gamewindow.positionp2=Integer.parseInt(p2);
 				gamewindow.repaint();
 			}
+			public void show(String[] datas) {
+				SpriteShow.getInstance().clear();
+				int score=Integer.parseInt(datas[1]);
+				int n=Integer.parseInt(datas[2]);
+				
+				SpriteShow.getInstance().setscore(score);
+				for (int i=0;i<n;i++)
+				{
+					int x=Integer.parseInt(datas[5*i+3]);
+					int y=Integer.parseInt(datas[5*i+4]);
+					int width=Integer.parseInt(datas[5*i+5]);
+					int height=Integer.parseInt(datas[5*i+6]);
+					int imagenumber=Integer.parseInt(datas[5*i+7]);
+					SpriteShow.getInstance().addshow(x, y, width, height, imagenumber);
+				}
+				gamewindow.repaint();
+			}
 			public void run() {
 				try {
-					byte[] buffer = new byte[1024];
+					byte[] buffer = new byte[65536*16];
 					receivePacket = new DatagramPacket(buffer, buffer.length);
 					while (true) {
 						socket.receive(receivePacket);
@@ -161,8 +180,11 @@ public class Listener {
 							joinack(datas[1],datas[2]);
 							//System.out.println("right"+datas[1]+" "+datas[2]);
 							break;
-						case "Game":
-							
+						case "GAME":
+							show(datas);
+							break;
+						case "Start!":
+							gamewindow.togame();
 							break;
 						default:
 							System.out.println(socket.getPort()+"Bad data: " +tmp);

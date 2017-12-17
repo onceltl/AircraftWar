@@ -4,14 +4,16 @@ import java.awt.Graphics;
 
 public class Bullet extends Sprite
 {
-	public Bullet(int x,int y,int width,int height) {
-		super(x,y,width,height);
+	private static int offset=21;
+	int kind;
+	int owen;
+	public Bullet(int x,int y,int width,int height,int kind,int owen,Dir dir) {
+		super(x,y,width,height,dir);
+		this.kind=kind;
+		this.owen=owen;
 	}
-	public void move() {
-		
-	}
-	public void drawSuperFire(Graphics g) {
-		
+	public  int shownumber() {
+		return kind+offset;
 	}
 	
 }
