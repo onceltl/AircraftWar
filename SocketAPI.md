@@ -25,5 +25,10 @@
 	返回P1： GAME，score,n
 		    x,y,w,h,number
 	返回P2：GAME
+
+6.P1移动
+	LEFT/RIGHT/UP/DOWN
+	返回P1：P1LEFT/LEFT/RIGHT/UP/DOWN
+	返回P2：
 	
 	

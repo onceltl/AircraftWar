@@ -34,8 +34,15 @@ public class SpriteShow {
 		shows.clear();
 	}
 	public void paint(Graphics g) {
+		
 		for (Show show:shows) {
 			g.drawImage(ImageController.getInstance().find(show.imagenumber), show.x, show.y,show.width,show.height,null);
+		}
+		g.drawImage(ImageController.getInstance().score, 200,20,45,25,null);
+		String str=Integer.toString(score);
+		for (int i=0;i<str.length();i++) {
+			int index=str.charAt(i)-'0';
+			g.drawImage(ImageController.getInstance().number[index], 260+i*18,22,15,20,null);
 		}
 	}
 	public static SpriteShow getInstance() {

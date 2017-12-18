@@ -2,9 +2,11 @@ package sprites;
 
 import java.awt.Graphics;
 
+import controller.GameWindow;
+
 public class Bullet extends Sprite
 {
-	private static int offset=21;
+	public static int offset=0;
 	int kind;
 	int owen;
 	public Bullet(int x,int y,int width,int height,int kind,int owen,Dir dir) {
@@ -15,5 +17,4 @@ public class Bullet extends Sprite
 	public  int shownumber() {
 		return kind+offset;
 	}
-	
 }

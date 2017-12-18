@@ -12,7 +12,6 @@ public class SpriteThread extends Thread{
 			try {
 				SpriteController.getInstance().step();
 				String str=SpriteController.getInstance().getinfo();
-				//System.out.println(str);
 				Packet packet = new Packet(gamewindow.clientp1.getAddress(),gamewindow.clientp1.getPort(),
 						str);
 				gamewindow.serversender.addPacket(packet);
@@ -21,7 +20,9 @@ public class SpriteThread extends Thread{
 							str);
 					gamewindow.serversender.addPacket(packet);
 				}
+				if (str.contains("GameOver!"))break; 
 				sleep(20);
+				//break;
 			}catch(Exception e) {
 			}
 		}

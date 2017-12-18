@@ -2,6 +2,7 @@ package controller;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -24,7 +25,10 @@ import connect.Packet;
 import connect.Sender;
 import connect.Server;
 import sprites.Dir;
+import sprites.FrameSprite;
+import sprites.HeroPlane;
 import sprites.Plane;
+import sprites.Supply;
 
 
 public class GameWindow extends JPanel{
@@ -46,6 +50,9 @@ public class GameWindow extends JPanel{
 	public DatagramSocket clientsocket;
 	public Sender serversender;
 	public SpriteThread spritethread;
+	public int []finalscore=new int[20];
+	public int back1x,back1y,back1w,back1h,back1kind;
+	public int back2x,back2y,back2w,back2h,back2kind;
 	public GameWindow() {
 		//窗口基本设置
 		setSize(width, height);
@@ -114,13 +121,13 @@ public class GameWindow extends JPanel{
 	
 		//飞机
 		SpriteController.getInstance().clear();
-		Plane herop1=new Plane(100,530,70,70,serverp1,1,new Dir(0,0));
+		HeroPlane herop1=new HeroPlane(100,530,70,70,serverp1,1,new Dir(0,0));
 		SpriteController.getInstance().sethero1p(herop1);
 		if (clientp2!=null) {
-			Plane herop2=new Plane(200,530,70,70,serverp2,1,new Dir(0,0));
+			HeroPlane herop2=new HeroPlane(200,530,70,70,serverp2,1,new Dir(0,0));
 			SpriteController.getInstance().sethero2p(herop2);
 		}
-		System.out.println(SpriteController.getInstance().getinfo());
+		//System.out.println(SpriteController.getInstance().getinfo());
 		//游戏线程：产生敌人,move,碰撞
 		spritethread=new SpriteThread(this);
 		spritethread.start();
@@ -195,7 +202,9 @@ public class GameWindow extends JPanel{
 			g.drawImage(ImageController.getInstance().plane[2][1], 213, 140,120,120,null);
 			g.drawImage(ImageController.getInstance().plane[3][1], 40, 310,120,120,null);
 			g.drawImage(ImageController.getInstance().plane[4][1], 213, 310,120,120,null);
-			
+			g.setFont(new Font("ltlfont",Font.BOLD,14));
+			g.setColor(Color.white);
+			g.drawString("使用\"→\"和\"←\"选择喜欢的飞机，按下Enter开始游戏吧！", 0, height-10);
 			return;
 		}
 		if (State.getInstance().isInGame()) {
@@ -204,19 +213,43 @@ public class GameWindow extends JPanel{
 			SpriteShow.getInstance().paint(g);
 			return;
 		}
+		if (State.getInstance().isInEnd()) {
+			g.setColor(Color.BLACK);
+			g.fillRect(0,0,width,height);
+			g.drawImage(ImageController.getInstance().backgroud[back1kind], back1x, back1y, back1w, back1h,null);
+			g.drawImage(ImageController.getInstance().backgroud[back2kind], back2x, back2y, back2w, back2h,null);
+			g.drawImage(ImageController.getInstance().over, 60,30,250,80,null);
+			g.drawImage(ImageController.getInstance().score, 200-60,20+100,45,25,null);
+			String str=Integer.toString(finalscore[0]);
+			for (int i=0;i<str.length();i++) {
+				int index=str.charAt(i)-'0';
+				g.drawImage(ImageController.getInstance().number[index], 260+i*18-60,22+100,15,20,null);
+			}
+			g.drawImage(ImageController.getInstance().rank, 50,150,65,25,null);
+			for (int k=1;k<=5;k++) {
+				str=Integer.toString(finalscore[k]);
+				g.drawImage(ImageController.getInstance().number[k], 100,22+100+k*70,25,40,null);
+				for (int i=0;i<str.length();i++) {
+					int index=str.charAt(i)-'0';
+					g.drawImage(ImageController.getInstance().number[index], 260+i*18,22+95+k*70,20,40,null);
+				}
+			}
+			g.setFont(new Font("ltlfont",Font.BOLD,15));
+			g.setColor(Color.white);
+			g.drawString("按下Esc返回主菜单", 0, height-10);
+			
+			return;
+		}
 		if (State.getInstance().isInTest()) {
-			g.drawImage(ImageController.getInstance().backgroud[1], 0,0,380,600,null);
-			g.drawImage(ImageController.getInstance().plane[1][1], 100,530,70,70,null);
-			g.drawImage(ImageController.getInstance().plane[2][1], 200,530,70,70,null);
-
-			g.drawImage(ImageController.getInstance().enemy[1], 100,100,70,70,null);
-			g.drawImage(ImageController.getInstance().enemy[2], 200,100,70,70,null);
-			g.drawImage(ImageController.getInstance().enemy[3], 300,100,70,70,null);
-			g.drawImage(ImageController.getInstance().enemy[4], 100,200,70,70,null);
-			g.drawImage(ImageController.getInstance().enemy[5], 100,300,70,70,null);
-			g.drawImage(ImageController.getInstance().enemy[6], 200,200,70,70,null);
-			g.drawImage(ImageController.getInstance().enemy[7], 200,300,70,70,null);
-			g.drawImage(ImageController.getInstance().enemy[8], 300,300,70,70,null);
+			g.setColor(Color.BLACK);
+			g.fillRect(0,0,width,height);
+			g.drawImage(ImageController.getInstance().score, 200,20,45,25,null);
+			String str=Integer.toString(123506);
+			for (int i=0;i<str.length();i++) {
+				int index=str.charAt(i)-'0';
+				g.drawImage(ImageController.getInstance().number[index], 260+i*18,22,15,20,null);
+			}
+			
 		}
 	}
 	public void create_Room() {
@@ -226,6 +259,33 @@ public class GameWindow extends JPanel{
 	public void join_Room() {
 		joindialog.setLocation(window.getX() + window.getWidth()/2 - joindialog.getWidth()/2, window.getY() +window.getHeight()/2 - joindialog.getHeight()/2);
 		joindialog.setVisible(true);
+	}
+	public void restart() {
+		State.getInstance().nextstate();
+		repaint();
+	}
+	public void gameover(String []datas) {
+		State.getInstance().nextstate();
+		back1x=Integer.parseInt(datas[1]);
+		back1y=Integer.parseInt(datas[2]);
+		back1w=Integer.parseInt(datas[3]);
+		back1h=Integer.parseInt(datas[4]);
+		back1kind=Integer.parseInt(datas[5]);
+		back2x=Integer.parseInt(datas[6]);
+		back2y=Integer.parseInt(datas[7]);
+		back2w=Integer.parseInt(datas[8]);
+		back2h=Integer.parseInt(datas[9]);
+		back2kind=Integer.parseInt(datas[10]);
+		for (int i=0;i<=10;i++)
+			finalscore[i]=Integer.parseInt(datas[i+11]);
+		repaint();
+		if (!this.isP1) return;
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"STOP");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
 	}
 	public void certain_join_room() {
 		int port=Integer.parseInt(porttext.getText());
@@ -274,12 +334,11 @@ public class GameWindow extends JPanel{
 			serversocket=new DatagramSocket(port);
 			serverlisten=new Listener(this);
 			serverlisten.listen(serversocket);
-			serversender=new Sender();
-			serversender.start(serversocket);
+			serversender=new Sender(serversocket);
 			server=new Server("localhost",port);
 			//改变状态
-			State.getInstance().nextstate();
 			createdialog.setVisible(false);
+			State.getInstance().nextstate();
 			this.repaint();
 		}catch(Exception e){
 			JOptionPane.showMessageDialog(this, "房间号被占用", "错误",JOptionPane.ERROR_MESSAGE);
@@ -295,6 +354,86 @@ public class GameWindow extends JPanel{
 	}
 	public void  leftPosition() {
 		Packet packet = new Packet(server.getAddress(),server.getPort(),"MoveLFET");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}
+	public void pressedleft() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"pressedleft");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}
+	public void pressedright() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"pressedright");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}	
+	public void pressedup() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"pressedup");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}	
+	public void presseddown() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"presseddown");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}
+	public void pressedspace() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"pressedspace");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}
+	public void releasedleft() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"releasedleft");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}
+	public void releasedright() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"releasedright");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}	
+	public void releasedup() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"releasedup");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}	
+	public void releaseddown() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"releaseddown");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}
+	public void releasedspace() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"releasedspace");
 		try{
 			clientsocket.send(packet.getDataPacket());
 		}catch(Exception e) {

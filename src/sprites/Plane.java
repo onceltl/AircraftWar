@@ -8,7 +8,7 @@ import controller.State;
 
 public class Plane extends Sprite
 {
-	private static int offset=8;
+	public static int offset=0;
 	int kind;
 	int HP;
 	int firecount;
@@ -19,7 +19,7 @@ public class Plane extends Sprite
 		this.owen=owen;
 		HP=1;
 		if (kind>10) HP=2;
-		firecount=0;	
+		firecount=0; 	
 	}
 	public int shownumber() {
 		if (owen==0) return kind+offset;
@@ -30,48 +30,33 @@ public class Plane extends Sprite
 		if (firecount==100) {
 			firecount=0;
 			if (owen==0){
-				Bullet bullet=new Bullet(x+width/2-5,y+height,10,10,1,owen,new Dir(0,10));
+				Bullet bullet=new Bullet(x+width/2-10,y+height,20,30,kind%8+1,owen,new Dir(0,3));
 				SpriteController.getInstance().addBullet(bullet);
 		
 			}else{
-				Bullet bullet=new Bullet(x+width/2-5,y,10,10,1,owen,new Dir(0,-10));
+				Bullet bullet=new Bullet(x+width/2-10,y,20,30,kind,owen,new Dir(0,-10));
 				SpriteController.getInstance().addBullet(bullet);
-			}
-		}
-	}
-	public void intersectPlane(List<Plane> planes) {
-		Rectangle size=getRectangle();
-		for (Plane plane:planes) {
-			if (size.intersects(plane.getRectangle())) {
-				HP--;
-				plane.HP--;
-				if (plane.HP<=0) plane.islive=false;
-					//boom
-				islive=false;
-				break;
-			}
-		}
-	}
-	public void intersectSupply(List<Supply> supplys) {
-		Rectangle size=getRectangle();
-		
-		for (Supply supply:supplys) {
-			if (supply.islive&&size.intersects(supply.getRectangle())) {
-				//get
-				supply.islive=false;
 			}
 		}
 	}
 	public void intersectBullet(List<Bullet> bullets) {
 		Rectangle size=getRectangle();
-		
 		if (owen!=0)
 			for (Bullet bullet:bullets) {
 				if (bullet.owen==0&&size.intersects(bullet.getRectangle())) {
 				//get
 					HP--;
 					bullet.islive=false;
-					islive=false;
+					FrameSprite boom;
+					if (HP==0)
+					{
+							islive=false;
+							boom=new FrameSprite(x,y,width,height,1,new Dir(0,0));
+							SpriteController.getInstance().addFrameSprite(boom);
+					} else {
+						boom=new FrameSprite(bullet.x,bullet.y,70,70,1,new Dir(0,0));
+						SpriteController.getInstance().addFrameSprite(boom);
+					}
 					break;
 				}
 			}
@@ -81,7 +66,17 @@ public class Plane extends Sprite
 				//get
 					HP--;
 					bullet.islive=false;
-					islive=false;
+					FrameSprite boom;
+					if (HP==0)
+					{
+							SpriteController.getInstance().score++;
+							islive=false;
+							boom=new FrameSprite(x,y,width,height,1,new Dir(0,0));
+							SpriteController.getInstance().addFrameSprite(boom);
+					} else {
+						boom=new FrameSprite(bullet.x,bullet.y,70,70,1,new Dir(0,0));
+						SpriteController.getInstance().addFrameSprite(boom);
+					}
 					break;
 				}
 			}

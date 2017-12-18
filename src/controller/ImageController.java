@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import sprites.*;
+
 public class ImageController {
 	private static ImageController INSTANCE=new ImageController();
 	public Image load,createroom,joinroom,help,helpon,joinroomon,createroomon,icon;
@@ -23,6 +25,7 @@ public class ImageController {
 	public Image []staticimage=new Image[20];
 	public Image []number=new Image[20];
 	public Image []update=new Image[20];
+	public Image []supply=new Image[10];
 	public List<Image> images;
 	//Set<Integer> numbers=new TreeSet<Integer>();
 	private ImageController() {
@@ -44,6 +47,9 @@ public class ImageController {
 			   choiceboard=ImageIO.read(this.getClass().getResource("/images/choiceboard.png"));
 			   choicep1=ImageIO.read(this.getClass().getResource("/images/1P.png"));
 			   choicep2=ImageIO.read(this.getClass().getResource("/images/2P.png"));
+			   for (int i=0;i<10;i++) {
+				   number[i]=ImageIO.read(this.getClass().getResource("/images/number ("+i+").png"));
+			   }
 			   plane[1][1]=ImageIO.read(this.getClass().getResource("/images/plane1.png"));
 			   plane[1][2]=ImageIO.read(this.getClass().getResource("/images/plane1_f.png"));
 			   plane[1][3]=ImageIO.read(this.getClass().getResource("/images/plane1_l.png"));
@@ -61,21 +67,42 @@ public class ImageController {
 			   plane[4][3]=ImageIO.read(this.getClass().getResource("/images/plane4_l.png"));
 			   plane[4][4]=ImageIO.read(this.getClass().getResource("/images/plane4_r.png"));
 			   
-			   backgroud[1]=ImageIO.read(this.getClass().getResource("/images/backgroud1.png"));
-			   backgroud[2]=ImageIO.read(this.getClass().getResource("/images/backgroud2.png"));
-			   backgroud[3]=ImageIO.read(this.getClass().getResource("/images/backgroud3.png"));
-			   backgroud[4]=ImageIO.read(this.getClass().getResource("/images/backgroud4.png"));
-			 //  testbullet=ImageIO.read(this.getClass().getResource("/images/testbullet.png"));
+			   images.add(icon);
+			   for (int i=1;i<=4;i++)   {
+				   backgroud[i]=ImageIO.read(this.getClass().getResource("/images/backgroud"+i+".png"));
+				   images.add(backgroud[i]);
+			   }
+			   
+			   HeroPlane.herooffset=images.size()-1;
+			   //plane
+			   for (int i=1;i<=4;i++)
+				   for (int j=1;j<=4;j++)
+					   images.add(plane[i][j]);
+			   Boss.bossoffset=images.size()-1;
 			   for (int i=1;i<=12;i++) {
 				   boss[i]=ImageIO.read(this.getClass().getResource("/images/boss ("+i+").png"));
+				   images.add(boss[i]);
 			   }
+
+			   Plane.offset=images.size()-1;
+			   for (int i=1;i<=13;i++) {
+				   enemy[i]=ImageIO.read(this.getClass().getResource("/images/enemy"+i+".png"));
+				   images.add(enemy[i]);
+			   }
+			   //bullet
+			   Bullet.offset=images.size()-1;
+			   for (int i=1;i<=12;i++) {
+				   normalbullet[i]=ImageIO.read(this.getClass().getResource("/images/normalbullet ("+i+").png"));
+				   images.add(normalbullet[i]);
+			   }
+			   SuperBullet.superoffset=images.size()-1;
 			   for (int i=1;i<=10;i++) {
 				   updatebullet[1][i]=ImageIO.read(this.getClass().getResource("/images/bullet1 ("+i+").png"));
 			   }
-			   for (int i=1;i<=8;i++) {
+			   for (int i=1;i<=6;i++) {
 				   updatebullet[2][i]=ImageIO.read(this.getClass().getResource("/images/bullet2 ("+i+").png"));
 			   }
-			   for (int i=1;i<=6;i++) {
+			   for (int i=1;i<=8;i++) {
 				   updatebullet[3][i]=ImageIO.read(this.getClass().getResource("/images/bullet3 ("+i+").png"));
 			   }
 			   for (int i=1;i<=4;i++) {
@@ -84,41 +111,41 @@ public class ImageController {
 			   for (int i=1;i<=10;i++) {
 				   updatebullet[5][i]=ImageIO.read(this.getClass().getResource("/images/bullet5 ("+i+").png"));
 			   }
-			   for (int i=1;i<=12;i++) {
-				   normalbullet[i]=ImageIO.read(this.getClass().getResource("/images/normalbullet ("+i+").png"));
+			   for (int i=1;i<=5;i++)
+				   for (int j=1;j<=10;j++)
+					   images.add(updatebullet[i][j]);
+			   
+			   HeroPlane.superoffset=images.size()-1;
+			   for (int i=1;i<=10;i++) {
+				   superfire[i]=ImageIO.read(this.getClass().getResource("/images/superfire ("+i+").png"));
+				   images.add(superfire[i]);
 			   }
-			   for (int i=0;i<10;i++) {
-				   number[i]=ImageIO.read(this.getClass().getResource("/images/number ("+i+").png"));
-			   }
-			   for (int i=1;i<=12;i++) {
-				   boom[i]=ImageIO.read(this.getClass().getResource("/images/boom ("+i+").png"));
-			   }
+			   
+			   
+			   HeroPlane.updateoffset=images.size()-1;
 			   for (int i=1;i<=4;i++) {
 				   update[i]=ImageIO.read(this.getClass().getResource("/images/update"+i+".png"));
-			   }
-			   for (int i=1;i<=13;i++) {
-				   enemy[i]=ImageIO.read(this.getClass().getResource("/images/enemy"+i+".png"));
+				   images.add(update[i]);
 				}
+			   //ÔªËØ
+			   Supply.supplyoffset=images.size()-1;
+			   for (int i=1;i<=4;i++) {
+				   supply[i]=ImageIO.read(this.getClass().getResource("/images/gem"+i+".png"));
+				   images.add(supply[i]);
+			   }
+			   FrameSprite.framespriteoffset=images.size()-1;
+			   for (int i=1;i<=12;i++) {
+				   boom[i]=ImageIO.read(this.getClass().getResource("/images/boom ("+i+").png"));
+				   images.add(boom[i]);
+			   }
 			   staticimage[1]=ImageIO.read(this.getClass().getResource("/images/BOSSAPP.png"));
 			   staticimage[2]=ImageIO.read(this.getClass().getResource("/images/menu1.png"));
 			   staticimage[3]=ImageIO.read(this.getClass().getResource("/images/menu2.png"));
-			   staticimage[3]=ImageIO.read(this.getClass().getResource("/images/cloud1.png"));
-			   staticimage[4]=ImageIO.read(this.getClass().getResource("/images/cloud2.png"));
-			   /*
-			   images.add(icon);
-			   images.add(plane[1][1]);
-			   images.add(plane[2][1]);
-			   images.add(plane[3][1]);
-			   images.add(plane[4][1]);
-			   images.add(backgroud[1]);
-			   images.add(backgroud[2]);
-			   images.add(backgroud[3]);
-			   images.add(backgroud[4]);
-			   for (int i=1;i<=13;i++) {
-				   //enemy[i]=ImageIO.read(this.getClass().getResource("/images/enemy"+i+".png"));
-				   images.add(enemy[i]);
-				}
-			   images.add(testbullet);*/
+			   staticimage[4]=ImageIO.read(this.getClass().getResource("/images/cloud1.png"));
+			   staticimage[5]=ImageIO.read(this.getClass().getResource("/images/cloud2.png"));
+			   for (int i=1;i<=5;i++) {
+				   images.add(staticimage[i]);
+			   }
 		}catch(Exception e) {
 			   System.out.println("No point png.");
 		   }

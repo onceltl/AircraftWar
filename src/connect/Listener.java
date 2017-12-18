@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 
 import controller.Constant;
 import controller.GameWindow;
+import controller.SpriteController;
 import controller.SpriteShow;
 import controller.State;
 
@@ -137,6 +138,62 @@ public class Listener {
 				}
 				gamewindow.repaint();
 			}
+			public void pressedleft(int port) {
+				if (port==Constant.getInstance().getport1p()&&SpriteController.getInstance().hero1p!=null) {
+					SpriteController.getInstance().hero1p.setpressdmove(1);
+				}
+				if (port==Constant.getInstance().getport2p()&&SpriteController.getInstance().hero2p!=null) {
+					SpriteController.getInstance().hero2p.setpressdmove(1);
+				}
+			}
+			public void pressedright(int port) {
+				if (port==Constant.getInstance().getport1p()&&SpriteController.getInstance().hero1p!=null) {
+					SpriteController.getInstance().hero1p.setpressdmove(2);
+				}
+				if (port==Constant.getInstance().getport2p()&&SpriteController.getInstance().hero2p!=null) {
+					SpriteController.getInstance().hero2p.setpressdmove(2);
+				}
+			}
+			public void pressedup(int port) {
+				if (port==Constant.getInstance().getport1p()&&SpriteController.getInstance().hero1p!=null) {
+					SpriteController.getInstance().hero1p.setpressdmove(3);
+				}
+				if (port==Constant.getInstance().getport2p()&&SpriteController.getInstance().hero2p!=null) {
+					SpriteController.getInstance().hero2p.setpressdmove(3);
+				}
+			}
+			public void presseddown(int port) {
+				if (port==Constant.getInstance().getport1p()&&SpriteController.getInstance().hero1p!=null) {
+					SpriteController.getInstance().hero1p.setpressdmove(4);
+				}
+				if (port==Constant.getInstance().getport2p()&&SpriteController.getInstance().hero2p!=null) {
+					SpriteController.getInstance().hero2p.setpressdmove(4);
+				}
+			}
+			public void pressedspace(int port) {
+				if (port==Constant.getInstance().getport1p()&&SpriteController.getInstance().hero1p!=null) {
+					SpriteController.getInstance().hero1p.setFire();
+				}
+				if (port==Constant.getInstance().getport2p()&&SpriteController.getInstance().hero2p!=null) {
+					SpriteController.getInstance().hero2p.setFire();
+				}
+			}
+			public void releaseddir(int port,int dir) {
+				if (port==Constant.getInstance().getport1p()&&SpriteController.getInstance().hero1p!=null) {
+					SpriteController.getInstance().hero1p.setreleasedmove(dir);
+				}
+				if (port==Constant.getInstance().getport2p()&&SpriteController.getInstance().hero2p!=null) {
+					SpriteController.getInstance().hero2p.setreleasedmove(dir);
+				}
+			}
+			public void releasedspace(int port) {
+				if (port==Constant.getInstance().getport1p()&&SpriteController.getInstance().hero1p!=null) {
+					SpriteController.getInstance().hero1p.closeFire();
+				}
+				if (port==Constant.getInstance().getport2p()&&SpriteController.getInstance().hero2p!=null) {
+					SpriteController.getInstance().hero2p.closeFire();
+				}
+			}
 			public void run() {
 				try {
 					byte[] buffer = new byte[65536*16];
@@ -145,7 +202,7 @@ public class Listener {
 						socket.receive(receivePacket);
 						byte[] data = receivePacket.getData();
 						String tmp = new String(data, 0, receivePacket.getLength());
-						System.out.println("Receive: " + tmp); 
+						//System.out.println("Receive: " + tmp); 
 						String[] datas = tmp.split(",");
 
 						switch (datas[0]) {
@@ -168,7 +225,38 @@ public class Listener {
 						case "AskStart":
 							gamewindow.startgame();
 							break;
-						//
+						case "releasedleft":
+							releaseddir(receivePacket.getPort(),1);
+							break;
+						case "releasedright":
+							releaseddir(receivePacket.getPort(),2);
+							break;
+						case "releasedup":
+							releaseddir(receivePacket.getPort(),3);
+							break;
+						case "releaseddown":
+							releaseddir(receivePacket.getPort(),4);
+							break;
+						case "releasedspace":
+							releasedspace(receivePacket.getPort());
+							break;
+						case "pressedleft":
+						//	System.out.println("receive");
+							pressedleft(receivePacket.getPort());
+							//System.out.println("right");
+							break;
+						case "pressedright":
+							pressedright(receivePacket.getPort());
+							break;
+						case "pressedup":
+							pressedup(receivePacket.getPort());
+							break;
+						case "presseddown":
+							presseddown(receivePacket.getPort());
+							break;
+						case "pressedspace":
+							pressedspace(receivePacket.getPort());
+							break;
 						//client
 						case "P1Move":
 							p1move(datas[1]);
@@ -189,9 +277,19 @@ public class Listener {
 						default:
 							System.out.println(socket.getPort()+"Bad data: " +tmp);
 						}
-
+						if (datas[0].equals("GameOver!")) 
+						{
+							gamewindow.gameover(datas);
+							socket.close();
+							break; 
+						}
+						if (datas[0].equals("STOP")) 
+						{
+							socket.close();
+							break; 
+						}
 						try {
-							Thread.sleep(20);
+							Thread.sleep(10);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
