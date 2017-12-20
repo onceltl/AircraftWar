@@ -8,19 +8,21 @@ import controller.SpriteController;
 
 public class HeroPlane  extends Plane{
 	public static int updateoffset=0;
-	public static int superfiretime=10000;
+	public static int superfiretime=500;
 	public static int herooffset=0;
 	public static int superoffset=0;
+	public static int updatetime=500;
+	
 	//private int keyboardmove;//L,R,U,D
 	public int superfire;
-	public boolean isupdate;
+	public int isupdate;
 	public boolean isfire;
 	public boolean isleftmove,isrightmove,isupmove,isdownmove;
 	public HeroPlane(int x,int y,int width,int height,int kind,int owen,Dir dir){
 		super(x,y,width,height,kind,owen,dir);
 		//keyboardmove=0;
 		superfire=0;
-		isupdate=false;
+		isupdate=0;
 		isfire=false;
 		isleftmove=isrightmove=isupmove=isdownmove=false;
 	}
@@ -29,14 +31,14 @@ public class HeroPlane  extends Plane{
 	}
 	public synchronized  void setFire() {
 		isfire=true;
-		if (isupdate)firecount=40-1;
-		else firecount=40-1;
+		firecount=40-1;
+		
 	}
 	public synchronized  void closeFire() {
 		isfire=false;
 	}
 	public  void setupdate() {
-		isupdate=true;
+		isupdate=updatetime;
 	}
 	public synchronized void setpressdmove(int dir) {
 		if (dir==1) isleftmove=true;
@@ -58,7 +60,15 @@ public class HeroPlane  extends Plane{
 		return number;
 	}
 	public void move() {
-		if (superfire>0) superfire--;
+		if (superfire>0) {
+			superfire--;
+			if (superfire==0)
+				SpriteController.getInstance().sounds.add("gamebgm.mp3");
+			
+		}
+		if (isupdate>0) {
+			isupdate--;
+		}
 		if (isleftmove){x-=5;}
 		if (isrightmove){x+=5;}
 		if (isupmove){y-=5;}
@@ -72,16 +82,21 @@ public class HeroPlane  extends Plane{
 	public String getinfo() {
 		String str="";
 		if (superfire>0) str+=(x-20)+","+(-50)+","+(width+40)+","+(y+100)+","+(superoffset+superfire%10+1)+",";
-		if (isupdate) str+=(x-45)+","+(y-30)+","+(width+90)+","+(height+90)+","+(kind+updateoffset)+",";
+		if (isupdate>0) str+=(x-45)+","+(y-30)+","+(width+90)+","+(height+90)+","+(kind+updateoffset)+",";
 		str+=x+","+y+","+width+","+height+","+shownumber();
 		return str;
 	}
+	public Rectangle getRectangle() {
+		return new Rectangle(x+3,y+20,width-6,height-20);
+	}
 	public void fire() {
 		if (!isfire) return;
-		if(isupdate) {
+		if(isupdate>0) {
 			firecount++;
 			if (firecount==40) {
 				firecount=0;
+				SpriteController.getInstance().sounds.add("fire.mp3");
+				
 				if (kind==1)
 				{
 					SuperBullet bullet=new SuperBullet(x,y-50,70,70,kind,owen,new Dir(0,-4));
@@ -118,6 +133,8 @@ public class HeroPlane  extends Plane{
 		firecount++;
 		if (firecount==40) {
 			firecount=0;
+			SpriteController.getInstance().sounds.add("fire.mp3");
+			
 			Bullet bullet=new Bullet(x+width/2-5,y,10,10,1,owen,new Dir(0,-10));
 			SpriteController.getInstance().addBullet(bullet);
 			
@@ -134,10 +151,11 @@ public class HeroPlane  extends Plane{
 						{
 							plane.islive=false;
 							SpriteController.getInstance().score++;
-							
 						}
 					FrameSprite boom=new FrameSprite(plane.x+plane.width/2,plane.y+plane.height,70,70,1,new Dir(0,0));
 					SpriteController.getInstance().addFrameSprite(boom);
+					if (!(plane instanceof Boss))SpriteController.getInstance().sounds.add("boom.mp3");
+					
 				}
 			}
 		}
@@ -148,13 +166,17 @@ public class HeroPlane  extends Plane{
 				if (plane.HP<=0) 
 					{
 						plane.islive=false;
-						SpriteController.getInstance().score++;
+						if (plane.kind==20) SpriteController.getInstance().score+=10;
+						else if (plane.kind>10) SpriteController.getInstance().score+=2;
+						else  SpriteController.getInstance().score++;
+					
 						
 					}
 				FrameSprite boom=new FrameSprite(plane.x+plane.width/2,plane.y+plane.height,70,70,1,new Dir(0,0));
 				SpriteController.getInstance().addFrameSprite(boom);
 				boom=new FrameSprite(x,y,width,height,1,new Dir(0,0));
 				SpriteController.getInstance().addFrameSprite(boom);
+				SpriteController.getInstance().sounds.add("boom.mp3");
 				islive=false;
 				break;
 			}
@@ -164,12 +186,13 @@ public class HeroPlane  extends Plane{
 		Rectangle size=getRectangle();
 		for (Supply supply:supplys) {
 			if (supply.islive&&size.intersects(supply.getRectangle())) {
-				if (supply.kind==1) superfire+=100;
-				if (supply.kind==2) isupdate=true;
+				if (supply.kind==1) superfire+=superfiretime;
+				if (supply.kind==2) isupdate+=updatetime;
 				supply.islive=false;
 				FrameSprite menu=new FrameSprite(x,y,80,25,supply.kind+2,new Dir(0,2));
 				SpriteController.getInstance().addFrameSprite(menu);
-			
+				SpriteController.getInstance().sounds.add("powerUp.mp3");
+				if (supply.kind==1) SpriteController.getInstance().sounds.add("superfire.mp3");
 			}
 		}
 	}

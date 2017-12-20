@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.InputStream;
 import java.net.DatagramSocket;
 
 import javax.swing.JButton;
@@ -53,8 +54,12 @@ public class GameWindow extends JPanel{
 	public int []finalscore=new int[20];
 	public int back1x,back1y,back1w,back1h,back1kind;
 	public int back2x,back2y,back2w,back2h,back2kind;
+	public GameSound gamesound;
+	public boolean ispause;
 	public GameWindow() {
 		//窗口基本设置
+		gamesound=new GameSound();
+		gamesound.playBgSound("/sounds/startbgm.mp3");
 		setSize(width, height);
 		window=new JFrame();
 		window.add(this);
@@ -118,7 +123,7 @@ public class GameWindow extends JPanel{
 					"Start!");
 			serversender.addPacket(packet);
 		}
-	
+		
 		//飞机
 		SpriteController.getInstance().clear();
 		HeroPlane herop1=new HeroPlane(100,530,70,70,serverp1,1,new Dir(0,0));
@@ -134,6 +139,9 @@ public class GameWindow extends JPanel{
 	}
 	public void togame() {
 		State.getInstance().nextstate();
+		ispause=false;
+		gamesound.playBgSound("/sounds/gamebgm.mp3");
+		
 	}
 	public static void main(String[] args) {
 		GameWindow gamewindow=new GameWindow();
@@ -141,7 +149,7 @@ public class GameWindow extends JPanel{
 	}
 	public void paint(Graphics g) {
 		if (State.getInstance().isStart()) {
-			g.drawImage(ImageController.getInstance().load, 0, 0,width,height,null);
+			g.drawImage(ImageController.getInstance().load, 0, 0,width+10,height+10,null);
 			if (startop==0)g.drawImage(ImageController.getInstance().createroomon, 100, 380,200,100,null);
 				else g.drawImage(ImageController.getInstance().createroom, 100, 380,200,100,null);
 			if (startop==1)g.drawImage(ImageController.getInstance().joinroomon, 100, 440,200,100,null);
@@ -211,6 +219,7 @@ public class GameWindow extends JPanel{
 			g.setColor(Color.BLACK);
 			g.fillRect(0,0,width,height);
 			SpriteShow.getInstance().paint(g);
+			if (ispause)g.drawImage(ImageController.getInstance().pause, 20, 300, 300, 80,null);
 			return;
 		}
 		if (State.getInstance().isInEnd()) {
@@ -243,13 +252,6 @@ public class GameWindow extends JPanel{
 		if (State.getInstance().isInTest()) {
 			g.setColor(Color.BLACK);
 			g.fillRect(0,0,width,height);
-			g.drawImage(ImageController.getInstance().score, 200,20,45,25,null);
-			String str=Integer.toString(123506);
-			for (int i=0;i<str.length();i++) {
-				int index=str.charAt(i)-'0';
-				g.drawImage(ImageController.getInstance().number[index], 260+i*18,22,15,20,null);
-			}
-			
 		}
 	}
 	public void create_Room() {
@@ -263,8 +265,11 @@ public class GameWindow extends JPanel{
 	public void restart() {
 		State.getInstance().nextstate();
 		repaint();
+		gamesound.playBgSound("/sounds/startbgm.mp3");
 	}
 	public void gameover(String []datas) {
+		gamesound.playBgSound("/sounds/gameover.mp3");
+		
 		State.getInstance().nextstate();
 		back1x=Integer.parseInt(datas[1]);
 		back1y=Integer.parseInt(datas[2]);
@@ -304,8 +309,6 @@ public class GameWindow extends JPanel{
 			this.positionp2=0;
 			this.positionp1=0;
 			State.getInstance().nextstate();
-			//createdialog.setVisible(false);
-			//this.repaint();
 		}catch(Exception e) {
 			JOptionPane.showMessageDialog(this, "加入房间失败", "错误",JOptionPane.ERROR_MESSAGE);
 		}
@@ -344,8 +347,27 @@ public class GameWindow extends JPanel{
 			JOptionPane.showMessageDialog(this, "房间号被占用", "错误",JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	public void help() {
+		JOptionPane.showMessageDialog(this, "请查看操作说明文档", "提示",JOptionPane.INFORMATION_MESSAGE);
+	}
 	public void askstart() {
 		Packet packet = new Packet(server.getAddress(),server.getPort(),"AskStart");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}
+	public void  askpausegame() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"AskPause");
+		try{
+			clientsocket.send(packet.getDataPacket());
+		}catch(Exception e) {
+			System.out.println("sendwrong");
+		}
+	}
+	public void  askrestartgame() {
+		Packet packet = new Packet(server.getAddress(),server.getPort(),"AskRestart");
 		try{
 			clientsocket.send(packet.getDataPacket());
 		}catch(Exception e) {
@@ -450,6 +472,8 @@ public class GameWindow extends JPanel{
 	}
 	 private class MyItemListener implements ActionListener{
 		  public void actionPerformed(ActionEvent e){
+			  gamesound.playSound("/sounds/button.mp3");
+				
 			  Object obj=e.getSource();//获得事件源
 			  if (obj==joinButton) 
 				  certain_join_room();

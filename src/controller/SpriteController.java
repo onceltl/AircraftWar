@@ -18,6 +18,7 @@ public class SpriteController {
 	private List<Plane> planes;
 	private List<Supply> supplys;
 	private List<FrameSprite> framesprites;
+	public List<String> sounds;
 	public HeroPlane hero1p,hero2p;
 	private static SpriteController INSTANCE = new SpriteController();
 	private static int starty=-70;
@@ -27,12 +28,13 @@ public class SpriteController {
 	private int backy1,backy2;
 	private Random random;
 	public int score;
-	
+	public boolean ispause;
 	private SpriteController() {
 		bullets=new ArrayList<Bullet>();
 		planes=new ArrayList<Plane>();
 		supplys=new ArrayList<Supply>();
 		framesprites=new ArrayList<FrameSprite>();
+		sounds=new ArrayList<String>();
 		random=new Random();
 	}
 	public void clear() {
@@ -40,6 +42,7 @@ public class SpriteController {
 		planes.clear();
 		supplys.clear();
 		framesprites.clear();
+		sounds.clear();
 		hero1p=null;
 		hero2p=null;
 		score=0;
@@ -69,16 +72,25 @@ public class SpriteController {
 		return INSTANCE;
 	}
 	public void produce() {
-		if (random.nextInt(10000)==0){
-			Boss boss=new Boss(random.nextInt(GameWindow.width/2),starty,300,300,1,0,new Dir(0,0));
-			planes.add(boss);
+		if (random.nextInt(1000)==0){
+			boolean haveboss=false;
+			for (Plane e:planes)
+				if (e instanceof Boss) {
+					haveboss=true;
+					break;
+				}
+			if (!haveboss) {
+				Boss boss=new Boss(random.nextInt(GameWindow.width/2),-300,300,300,1,0,new Dir(0,0));
+				sounds.add("warning.mp3");
+				planes.add(boss);
+			}
 		}
-		if (random.nextInt(100)==0) {
-			Plane plane=new Plane(random.nextInt(GameWindow.width),starty,planewidth,planeheight,
+		if (random.nextInt(40)==0) {
+			Plane plane=new Plane(random.nextInt(GameWindow.width-planewidth),starty,planewidth,planeheight,
 					random.nextInt(13)+1,0,new Dir(0,4));
 			planes.add(plane);
 		}
-		if (random.nextInt(1000)==0) {
+		if (random.nextInt(400)==0) {
 			int bulletkind=random.nextInt(4)+9;
 			int w=0,h=0;
 			int speed=0;
@@ -97,15 +109,14 @@ public class SpriteController {
 				w=40;
 				h=80;
 
-				speed=5;
+				speed=10;
 			}
 			if (bulletkind==12) {
 				w=30;
 				h=80;
-
-				speed=5;
+				speed=10;
 			}
-			Bullet bullet=new Bullet(random.nextInt(GameWindow.width),starty,w,h,
+			Bullet bullet=new Bullet(random.nextInt(GameWindow.width-w),starty,w,h,
 					bulletkind,0,new Dir(0,speed));
 			bullets.add(bullet);
 		}
@@ -194,9 +205,8 @@ public class SpriteController {
 		if (hero1p==null&&hero2p==null) {
 			int []sendscore=new int[20];
 			StringBuffer str=new StringBuffer(","+score);
-			
 			try {
-				File file=new File(this.getClass().getResource("/scorerank.txt").toURI());
+				File file=new File("scorerank.txt");
 				FileInputStream in=new FileInputStream(file);
 				System.setIn(in);
 				Scanner scan=new Scanner(System.in);
@@ -227,12 +237,12 @@ public class SpriteController {
 		if (hero1p!=null){
 				n++;
 				if (hero1p.superfire>0)n++;
-				if (hero1p.isupdate)n++;
+				if (hero1p.isupdate>0)n++;
 			}
 		if (hero2p!=null){
 			n++;
 			if (hero2p.superfire>0)n++;
-			if (hero2p.isupdate)n++;
+			if (hero2p.isupdate>0)n++;
 		}
 		info.append(","+n);
 		info.append(","+"0,"+backy1+","+GameWindow.width+","+GameWindow.height+","+backgroundkind);
@@ -243,9 +253,12 @@ public class SpriteController {
 		if (hero1p!=null) info.append(","+hero1p.getinfo());
 		if (hero2p!=null) info.append(","+hero2p.getinfo());
 		for (Bullet e:bullets) info.append(","+e.getinfo());
+		for (String e:sounds) info.append(","+e);
 		return info.toString();
 	}
 	public void step() {
+		sounds.clear();
+		if (ispause) return; 
 		produce();
 		move();
 		intersect();

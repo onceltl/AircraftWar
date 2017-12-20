@@ -136,6 +136,10 @@ public class Listener {
 					int imagenumber=Integer.parseInt(datas[5*i+7]);
 					SpriteShow.getInstance().addshow(x, y, width, height, imagenumber);
 				}
+				int index=5*(n-1)+7;
+				for (int i=index+1;i<datas.length;i++)
+					if (datas[i].equals("superfire.mp3")||datas[i].equals("gamebgm.mp3")) gamewindow.gamesound.playBgSound("/sounds/"+datas[i]);
+						else gamewindow.gamesound.playSound("/sounds/"+datas[i]);
 				gamewindow.repaint();
 			}
 			public void pressedleft(int port) {
@@ -194,6 +198,28 @@ public class Listener {
 					SpriteController.getInstance().hero2p.closeFire();
 				}
 			}
+			public void pausegame() {
+				SpriteController.getInstance().ispause=true;
+				Packet packet = new Packet(gamewindow.clientp1.getAddress(),gamewindow.clientp1.getPort(),
+						"Pause!,"+Integer.toString(gamewindow.serverp1));
+				gamewindow.serversender.addPacket(packet);
+				if (gamewindow.clientp2!=null) {
+					packet = new Packet(gamewindow.clientp2.getAddress(),gamewindow.clientp2.getPort(),
+							"Pause!,"+Integer.toString(gamewindow.serverp1));
+					gamewindow.serversender.addPacket(packet);
+				}
+			}
+			public void restartgame() {
+				SpriteController.getInstance().ispause=false;
+				Packet packet = new Packet(gamewindow.clientp1.getAddress(),gamewindow.clientp1.getPort(),
+						"Restart!,"+Integer.toString(gamewindow.serverp1));
+				gamewindow.serversender.addPacket(packet);
+				if (gamewindow.clientp2!=null) {
+					packet = new Packet(gamewindow.clientp2.getAddress(),gamewindow.clientp2.getPort(),
+							"Restart!,"+Integer.toString(gamewindow.serverp1));
+					gamewindow.serversender.addPacket(packet);
+				}
+			}
 			public void run() {
 				try {
 					byte[] buffer = new byte[65536*16];
@@ -224,6 +250,12 @@ public class Listener {
 							break;
 						case "AskStart":
 							gamewindow.startgame();
+							break;
+						case "AskPause":
+							pausegame();
+							break;
+						case "AskRestart":
+							restartgame();
 							break;
 						case "releasedleft":
 							releaseddir(receivePacket.getPort(),1);
@@ -257,7 +289,8 @@ public class Listener {
 						case "pressedspace":
 							pressedspace(receivePacket.getPort());
 							break;
-						//client
+						
+							//client
 						case "P1Move":
 							p1move(datas[1]);
 							break;
@@ -274,8 +307,16 @@ public class Listener {
 						case "Start!":
 							gamewindow.togame();
 							break;
+						case "Pause!":
+							gamewindow.ispause=true;
+							break;
+						case "Restart!":
+							gamewindow.ispause=false;
+							break;
 						default:
-							System.out.println(socket.getPort()+"Bad data: " +tmp);
+								
+							if (!datas[0].equals("GameOver!")&&!datas[0].equals("STOP")) 
+								System.out.println(socket.getPort()+"Bad data: " +tmp);
 						}
 						if (datas[0].equals("GameOver!")) 
 						{

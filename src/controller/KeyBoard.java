@@ -2,6 +2,8 @@ package controller;
 
 import java.awt.event.KeyEvent;
 
+import javax.swing.JOptionPane;
+
 public class KeyBoard {
 	public GameWindow gamewindow;
 	public boolean ispressdup,ispressddown,ispressdleft,ispressdright,ispressdspace;
@@ -26,9 +28,12 @@ public class KeyBoard {
 				case KeyEvent.VK_UP:
 					if (gamewindow.startop!=0) gamewindow.startop--;
 					gamewindow.repaint();
+					gamewindow.gamesound.playSound("/sounds/button.mp3");
 					break;
 				case KeyEvent.VK_DOWN:
 					if (gamewindow.startop!=2) gamewindow.startop++;
+					gamewindow.gamesound.playSound("/sounds/button.mp3");
+					
 					gamewindow.repaint();
 					break;
 				default:
@@ -39,16 +44,23 @@ public class KeyBoard {
 			int key = e.getKeyCode();
 			switch(key) {
 				case KeyEvent.VK_LEFT:
+					gamewindow.gamesound.playSound("/sounds/select_plane.mp3");
+					
 					gamewindow.leftPosition();
 					break;
 				case KeyEvent.VK_RIGHT:
+					gamewindow.gamesound.playSound("/sounds/select_plane.mp3");
+					
 					gamewindow.rightPosition();
 					break;
 				case KeyEvent.VK_ENTER:
-					if (gamewindow.isP1) gamewindow.askstart();
-					break;
-				default:
+					gamewindow.gamesound.playSound("/sounds/button.mp3");
 					
+					if (gamewindow.isP1) gamewindow.askstart();
+						else 	JOptionPane.showMessageDialog(gamewindow, "你不是房主", "错误",JOptionPane.ERROR_MESSAGE);
+					
+					break;
+				default:	
 			}
 		}
 		if (State.getInstance().isInGame()) {
@@ -97,11 +109,13 @@ public class KeyBoard {
 				case KeyEvent.VK_ENTER:
 					//if (gamewindow.startop!=2) gamewindow.startop++;
 					//State.getInstance().nextstate();
+					gamewindow.gamesound.playSound("/sounds/button.mp3");
+					
 					if (gamewindow.startop==0) {
 						gamewindow.create_Room();
 					}else if (gamewindow.startop==1) {
 						gamewindow.join_Room();
-					}
+					} else gamewindow.help();
 					break;
 				default:
 			}
@@ -128,6 +142,14 @@ public class KeyBoard {
 				case KeyEvent.VK_SPACE:
 					gamewindow.releasedspace();
 					this.ispressdspace=false;
+					break;
+				case KeyEvent.VK_ESCAPE:
+					gamewindow.askpausegame();
+					this.ispressdspace=false;
+					break;
+				case KeyEvent.VK_ENTER:
+					if (gamewindow.ispause)
+						gamewindow.askrestartgame();
 					break;
 				default:
 					

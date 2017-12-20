@@ -14,24 +14,22 @@ public class Boss extends Plane{
 		frame=1;
 		count=0;
 		firecount=80;
-		HP=5;
+		HP=30;
 	}
 	public void fire() {
 		firecount++;
 		if (firecount==80) {
-			SuperBullet bullet=new SuperBullet(x+width/2-30,y+height-60,70,70,5,owen,new Dir(0,3));
+			SuperBullet bullet=new SuperBullet(x+width/2-30,y+height-60,70,70,5,owen,new Dir(0,5));
 			SpriteController.getInstance().addBullet(bullet);
-		//	bullet=new SuperBullet(x+width/2,y+height-80,70,70,5,owen,new Dir(0,0));
-			//SpriteController.getInstance().addBullet(bullet);
+			SpriteController.getInstance().sounds.add("BossBullet.mp3");
 		}
 		if (firecount==120) {
 			firecount=0;
-			SuperBullet bullet=new SuperBullet(x+width/2+70,y+height-80,70,70,5,owen,new Dir(0,3));
+			SuperBullet bullet=new SuperBullet(x+width/2+70,y+height-80,70,70,5,owen,new Dir(0,5));
 			SpriteController.getInstance().addBullet(bullet);
-			bullet=new SuperBullet(x+30,y+height-80,70,70,5,owen,new Dir(0,3));
+			bullet=new SuperBullet(x+30,y+height-80,70,70,5,owen,new Dir(0,5));
 			SpriteController.getInstance().addBullet(bullet);
-		//	bullet=new SuperBullet(x+width/2,y+height-80,70,70,5,owen,new Dir(0,0));
-			//SpriteController.getInstance().addBullet(bullet);
+			SpriteController.getInstance().sounds.add("BossBullet.mp3");
 		}
 		
 	}

@@ -28,7 +28,7 @@ public abstract class Sprite {
 		this.dir=dir;
 	}
 	public Rectangle getRectangle() {
-		return new Rectangle(x,y,width,height);
+		return new Rectangle(x+3,y,width-6,height-6);
 	}
 	public abstract int shownumber();
 	public String getinfo() {
